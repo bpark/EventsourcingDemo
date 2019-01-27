@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: eventstore-db
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: evdb
+    spec:
+      containers:
+        - name: eventstore-node
+          image: eventstore/eventstore
+          ports:
+            - containerPort: 2113
+            - containerPort: 2114
+            - containerPort: 1113
+            - containerPort: 1112
+        - name: hello-world
+          image: crccheck/hello-world
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eventstore-service-db
+spec:
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 8113
+      targetPort: 2113
+      nodePort: 32000
+    - name: com-port
+      protocol: TCP
+      port: 7113
+      targetPort: 1113
+      nodePort: 32001  
+  selector:
+    app: evdb
+  type: NodePort
