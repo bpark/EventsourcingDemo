@@ -34,7 +34,7 @@ namespace EventsourcingDemoClient
         {
             var streamEvents =
                 //connection.ReadStreamEventsForwardAsync("test-stream", 0, 3, false).Result;
-                Connection.ReadStreamEventsBackwardAsync("test-stream", StreamPosition.End, 3, false).Result;
+                Connection.ReadStreamEventsBackwardAsync("stream/events", StreamPosition.End, 3, false).Result;
 
             foreach (var evt in streamEvents.Events)
             {
@@ -49,7 +49,9 @@ namespace EventsourcingDemoClient
 
             var eventData = new MyEventData()
             {
-                Description = "Test"
+                Description = "Test",
+                Country = "US",
+                Name = "Doe"
             };
 
             var eventMeta = new MyEventMeta()
