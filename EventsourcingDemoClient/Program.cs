@@ -10,7 +10,7 @@ namespace EventsourcingDemoClient
     public class Program
     {
         private IEventStoreConnection Connection { get; } = Connect();
-        
+
         private static IEventStoreConnection Connect()
         {
             var c =
@@ -27,7 +27,7 @@ namespace EventsourcingDemoClient
                 Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(myEventData)),
                 Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(myEventMeta)));
 
-            Connection.AppendToStreamAsync("test-stream", ExpectedVersion.Any, myEvent).Wait();    
+            Connection.AppendToStreamAsync("test-stream", ExpectedVersion.Any, myEvent).Wait();
         }
 
         private void ReadEvents()
@@ -43,26 +43,30 @@ namespace EventsourcingDemoClient
                     Encoding.UTF8.GetString(evt.Event.Metadata));
             }
         }
-        
+
         private static void Main(string[] args)
         {
-
-            var eventData = new MyEventData()
+            var program = new Program();
+            
+            program.WriteEvent(new MyEventData()
             {
                 Description = "Test",
                 Country = "US",
                 Name = "Doe"
-            };
-
-            var eventMeta = new MyEventMeta()
+            }, new MyEventMeta()
             {
                 Timestamp = DateTime.Now
-            };
+            });
             
-            var program = new Program();
-            program.WriteEvent(eventData, eventMeta);
+            program.WriteEvent(new MyEventData()
+            {
+                Description = "Changed Description"
+            }, new MyEventMeta()
+            {
+                Timestamp = DateTime.Now
+            });
+            
             program.ReadEvents();
-            
         }
     }
 }
