@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       labels:
-        app: evdb
+        app: eventstore-db
     spec:
       containers:
         - name: eventstore-node
@@ -25,19 +25,40 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eventstore-service-db
+  name: eventstore-db
 spec:
   ports:
     - name: http-port
       protocol: TCP
       port: 8113
       targetPort: 2113
-      nodePort: 32000
     - name: com-port
       protocol: TCP
       port: 7113
       targetPort: 1113
-      nodePort: 32001  
+    - name: hw-port
+      protocol: TCP
+      port: 8001
+      targetPort: 8000  
   selector:
-    app: evdb
-  type: NodePort
+    app: eventstore-db
+  
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+
+metadata:
+  name: eventstore-db
+
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+    - host: eventstore.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: eventstore-db
+              servicePort: 8001
